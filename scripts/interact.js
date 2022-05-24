@@ -1,5 +1,5 @@
 const hre = require("hardhat");
-const MAIN_CONTRACT_ADDRESS = "0xeF31027350Be2c7439C1b0BE022d49421488b72C";
+const MAIN_CONTRACT_ADDRESS = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
 
 async function main() {
     //get accounts list
@@ -14,8 +14,8 @@ async function main() {
     const adminAddress = await myContract.admin();
     console.log(adminAddress);
     const signers = await hre.ethers.getSigners();
-    // await main.connect(signers[0]).createNewSession("1", "1", ["1"]);
-    // await main.connect(signers[0]).createNewSession("2", "2", ["2"]);
+    // await main.connect(signers[0]).createNewSession("name1", "1", ["1"]);
+    // await main.connect(signers[0]).createNewSession("name2", "2", ["2"]);
 
     // await main.connect(signers[1]).register("Duong1", "Duong1@gmail.com");
     // await main.connect(signers[2]).register("Duong1", "Duong1@gmail.com");
@@ -35,10 +35,10 @@ async function main() {
     // let participantDeviation3 = await session0.getParticipantDeviation(accounts[3].address);
 
     //propose(address _account, uint256 _price)
-    // console.log("Start state",await session0.state());
-    // await session0.connect(signers[1]).propose( hre.ethers.utils.parseEther("1"));
-    // await session0.connect(signers[2]).propose( hre.ethers.utils.parseEther("2"));
-    // await session0.connect(signers[3]).propose( hre.ethers.utils.parseEther("3"));
+    console.log("Start state",await session0.state());
+    await session1.connect(signers[1]).propose( hre.ethers.utils.parseEther("1"));
+    await session1.connect(signers[2]).propose( hre.ethers.utils.parseEther("2"));
+    await session1.connect(signers[3]).propose( hre.ethers.utils.parseEther("3"));
 
     let participantPropose1 = await session0.getParticipantProposedPrice(accounts[1].address);
     let participantPropose2 = await session0.getParticipantProposedPrice(accounts[2].address);
