@@ -26,16 +26,28 @@ contract Session {
     mapping(address => SessionPropose) public sessionProposes;
     uint256 public proposedPrice;
     uint256 public finalPrice;
-    address public admin;
+    address public admin; 
     Main public mainContract;
+    State public state; //
 
-    enum State {
-        CREATED,
-        STARTED,
-        CLOSING,
-        CLOSED
+    modifier onlyAdmin() {
+        require(msg.sender == admin, "Only admin");
+        _;
     }
-    State public state = State.CREATED; //
+    modifier onlyMainContract() {
+        require(msg.sender == address(mainContract), "Only main contract");
+        _;
+    }
+
+    modifier validState(State _expectedState) {
+        require(state == _expectedState, "Wrong state");
+        _;
+    }
+
+    modifier validParticipant(address _account) {
+        require(_account == msg.sender, "Wrong account");
+        _;
+    }
 
     constructor(
         address _mainContract,
@@ -48,20 +60,22 @@ contract Session {
     ) {
         mainContract = Main(_mainContract);
         admin = _admin;
-        productName = _productName;
-        productDescription = _productDescription;
         proposedPrice = _proposedPrice;
-        finalPrice = _finalPrice;
+        productName = _productName;
+        productDescription =  _productDescription;
         productImages = _productImages;
+        finalPrice = _finalPrice;
+        state = State.OPENED;
     }
 
-    function getSessionParticipants() external view returns(address[] memory) {
+    function getSessionParticipants() onlyAdmin external view returns(address[] memory) {
         return sessionParticipants;
     }
 
     function getParticipantDeviation(address _account)
-        external
+        internal
         view
+
         returns (uint256)
     {
         return mainContract.getParticipantDeviation(_account);
@@ -70,30 +84,32 @@ contract Session {
     function getParticipantProposedPrice(address _account)
         public
         view
+        validParticipant(msg.sender)
         returns (uint256)
     {
         return sessionProposes[_account].price;
     }
 
-    function propose(address _account, uint256 _price) external {
+    function propose(uint256 _price) external validParticipant(msg.sender) {
+
         if (
-            sessionProposes[_account].account == address(0) &&
-            sessionProposes[_account].price == 0
+            sessionProposes[msg.sender].account == address(0) &&
+            sessionProposes[msg.sender].price == 0
         ) {
             SessionPropose memory newPropose = SessionPropose({
-                account: _account,
+                account: msg.sender,
                 price: 0
             });
-            sessionProposes[_account] = newPropose;
-            sessionParticipants.push(_account);
+            sessionProposes[msg.sender] = newPropose;
+            sessionParticipants.push(msg.sender);
         }
-        sessionProposes[_account].price = _price;
+        sessionProposes[msg.sender].price = _price;
     }
 
     //them only admin
 
     function calculateProposedPrice() external {
-        
+        // require(state == State.STARTED || state == State.CLOSING, "Wrong state");
         require(sessionParticipants.length > 0, "No participant");
         
         uint256 numerator;
@@ -123,18 +139,19 @@ contract Session {
     //State start bid closing end 
     //State onging end
 
-    function closeSession() external {
-        //set state -> closing / 1. timeout 2. admin an close 
+    function closeSession() external  {
+        state = State.CLOSING;
     }
 
-    function afterClosingSession(uint256 _finalPrice) external {
+    function afterClosingSession(uint256 _finalPrice) external onlyAdmin {
         
         require(_finalPrice > 0, "No final price");
         // set state = closed vao day
+        state = State.CLOSED;
 
         finalPrice = _finalPrice;
         
-
+        // calculate and update dnew + accumulated deviation
         for(uint i=0; i < sessionParticipants.length; i++){
 
             address currentParticipationAddress = sessionParticipants[i];
@@ -145,9 +162,31 @@ contract Session {
             uint256 accumulatedDeviation = calculateParticipantAccumulatedDeviation(currentDeviation, participantNumberOfJoinedSession, newDeviation);
 
             mainContract.incrementParticipantNumberOfSession(currentParticipationAddress);
-            mainContract.setAccumulatedDeviation(currentParticipationAddress, accumulatedDeviation);
+            mainContract.updateParticipantDeviation(currentParticipationAddress, accumulatedDeviation);
         }
 
+        // updateSessionDetail(sessionDetail.productName, sessionDetail.productDescription, sessionDetail.productImages, finalPrice, state);
     }
 
+    function getFinalPrice() external view returns(uint256){
+        return finalPrice;
+    }
+
+    function updateSessionDetail(string memory _productName, string memory _productDescription, string[] memory _productImages) external onlyMainContract {
+        productName = _productName;
+        productDescription = _productDescription;
+        productImages = _productImages;
+    }
+
+    function getSessionDetail() external view returns(SessionDetail memory) {
+        SessionDetail memory _sessionDetail = SessionDetail({
+            sessionAddress: address(this),
+            productName: productName,
+            productDescription: productDescription,
+            productImages: productImages,
+            finalPrice: finalPrice,
+            state: state
+        });
+        return _sessionDetail;
+    }
 }
