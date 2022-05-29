@@ -139,7 +139,7 @@ contract Session {
     //State start bid closing end 
     //State onging end
 
-    function closeSession() external  {
+    function closeSession() external onlyAdmin  {
         state = State.CLOSING;
     }
 

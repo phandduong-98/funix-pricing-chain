@@ -25,8 +25,12 @@ export const isAdmin = async () => {
     if (typeof window.ethereum !== "undefined") {
         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
         const account = accounts[0];
-        if(adminAddress === account) return true;
+        if(adminAddress.toLowerCase() === account.toLowerCase()) {
+            console.log("is admin");
+            return true;
+        }
     }
+    console.log("not admin");
     return false;
 }
 

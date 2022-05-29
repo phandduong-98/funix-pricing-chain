@@ -3,9 +3,10 @@
     border-radius: 50%;
     height: 50px;
     width: 50px;
+    /* display: flex; */
 }
 
-.session_header {
+.session_content {
     display: flex;
     justify-content: space-between;
     align-items: center;
