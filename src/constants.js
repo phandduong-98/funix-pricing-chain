@@ -9,3 +9,4 @@ export const NETWORKS = {
 }
 
 export const MAIN_CONTRACT_ADDRESS = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+export const IMAGE_CID_LENGTH = 1;

@@ -3,12 +3,13 @@ import NavBar from './NavBar';
 import Register from './pages/register/Register';
 import Login from './pages/login/Login';
 import Sessions from './pages/sessions/Sessions';
-import Account from './pages/account/Account';
+import AccountDetail from './pages/account_detail/AccountDetail';
 import { BrowserRouter, Link, Routes, Route } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import SessionDetail from './pages/session_detail/SessionDetail';
-import AccountList from './pages/account_list/AccountList';
+import Accounts from './pages/accounts/Accounts';
 import { ethers } from "ethers";
+import CreateNewSession from './pages/create_new_session/CreateNewSession';
 
 function App() {
 
@@ -40,8 +41,10 @@ function App() {
           <Route path='/login' element={<Login />} />
           <Route path='/sessions/:address' element={<SessionDetail accounts={accounts} setAccounts={setAccounts} />} />
           <Route path='/sessions' element={<Sessions accounts={accounts} setAccounts={setAccounts} />} />
-          <Route path='/accountlist/:address' element={<Account accounts={accounts} setAccounts={setAccounts} />} />
-          <Route path='/accountlist' element={<AccountList accounts={accounts} setAccounts={setAccounts} />} />
+          <Route path='/accounts/:address' element={<AccountDetail accounts={accounts} setAccounts={setAccounts} />} />
+          <Route path='/accounts' element={<Accounts accounts={accounts} setAccounts={setAccounts} />} />
+          <Route path='/create-session' element={<CreateNewSession accounts={accounts} setAccounts={setAccounts} />} />
+
         </Routes>
       </BrowserRouter>
     </div>

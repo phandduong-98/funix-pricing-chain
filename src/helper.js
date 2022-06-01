@@ -3,7 +3,22 @@ import { MAIN_CONTRACT_ADDRESS } from './constants';
 import Main from './artifacts/contracts/Main.sol/Main.json';
 import Session from './artifacts/contracts/Session.sol/Session.json';
 
-export const loadContract = async (contractAddress) => {
+export const loadContractWithProvider = async (contractAddress) => {
+    if (typeof window.ethereum !== "undefined") {
+        let abi;
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        abi = (contractAddress === MAIN_CONTRACT_ADDRESS) ? Main.abi : Session.abi;
+        const contract = new ethers.Contract(
+            contractAddress,
+            abi,
+            provider
+        );
+        return contract;
+    }
+    return undefined;
+}
+
+export const loadContractWithSigner = async (contractAddress) => {
     if (typeof window.ethereum !== "undefined") {
         let abi;
         const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -20,7 +35,7 @@ export const loadContract = async (contractAddress) => {
 }
 
 export const isAdmin = async () => {
-    let contract = await loadContract(MAIN_CONTRACT_ADDRESS);
+    let contract = await loadContractWithSigner(MAIN_CONTRACT_ADDRESS);
     let adminAddress = await contract.admin();
     if (typeof window.ethereum !== "undefined") {
         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });

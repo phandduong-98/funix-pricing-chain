@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { loadContract, toStringState } from "../../helper";
+import { loadContractWithProvider, loadContractWithSigner, toStringState } from "../../helper";
 import styles from "./SessionDetail.module.css"
 import { ethers } from "ethers";
 import { isAdmin as checkAdmin } from "../../helper";
+import Carousel from "../../components/carousel/Carousel";
+
 const SessionDetail = ({ accounts, setAccounts }) => {
     const isConnected = Boolean(accounts);
 
@@ -17,21 +19,20 @@ const SessionDetail = ({ accounts, setAccounts }) => {
 
 
     const getSessionDetail = async () => {
-        let contract = await loadContract(address)
+        let contract = await loadContractWithProvider(address)
         let _sessionDetail = await contract.getSessionDetail();
         console.log("_sessionDetail", _sessionDetail);
         setSessionDetail(_sessionDetail);
         console.log(accounts[0])
         let _state = _sessionDetail.state;
         setState(_state);
-        console.log("_STATEEEEEEEEEEEEEE", _state);
-        setFinalPrice(ethers.utils.formatEther(sessionDetail.finalPrice));
+        setFinalPrice(ethers.utils.formatEther(_sessionDetail.finalPrice));
         let participantProposedPrice = await contract.getParticipantProposedPrice(accounts[0]);
         console.log(`participant: ${accounts[0]} proposed price: ${participantProposedPrice.toString()}`);
     }
 
     const getProposedPrice = async () => {
-        let contract = await loadContract(address)
+        let contract = await loadContractWithProvider(address)
         let participantProposedPrice = await contract.getParticipantProposedPrice(accounts[0]);
         setProposedPrice(ethers.utils.formatEther(participantProposedPrice));
         setProposedPriceInput(ethers.utils.formatEther(participantProposedPrice))
@@ -39,10 +40,14 @@ const SessionDetail = ({ accounts, setAccounts }) => {
     }
 
     const getFinalPrice = async () => {
-        let contract = await loadContract(address)
+        let contract = await loadContractWithProvider(address)
         let _finalPrice = await contract.getFinalPrice();
         setFinalPrice(ethers.utils.formatEther(_finalPrice));
-        console.log("final price",ethers.utils.formatEther(_finalPrice));
+        console.log("final price", ethers.utils.formatEther(_finalPrice));
+    }
+
+    const getIsAdmin = async () => {
+        return await checkAdmin();
     }
 
     useEffect(() => {
@@ -51,16 +56,11 @@ const SessionDetail = ({ accounts, setAccounts }) => {
         getSessionDetail();
         getProposedPrice();
         getFinalPrice();
-        const admin = async () => {
-            let _isAdmin = await checkAdmin();
-            setIsAdmin(_isAdmin);
-        }
-        admin()
-
+        getIsAdmin().then((_isAdmin) => setIsAdmin(_isAdmin));
     }, [accounts])
 
     const handleSubmit = async () => {
-        let contract = await loadContract(address);
+        let contract = await loadContractWithSigner(address);
         try {
             console.log("proposePriceInput", proposePriceInput);
             let tx = await contract.propose(ethers.utils.parseEther(proposePriceInput.toString()), { from: accounts[0] });
@@ -73,7 +73,7 @@ const SessionDetail = ({ accounts, setAccounts }) => {
     }
 
     const handleCloseSession = async () => {
-        let contract = await loadContract(address);
+        let contract = await loadContractWithSigner(address);
         try {
             if (isAdmin) {
                 let tx = await contract.closeSession({ from: accounts[0] });
@@ -89,14 +89,13 @@ const SessionDetail = ({ accounts, setAccounts }) => {
     }
 
     const handleFinalPrice = async () => {
-        let contract = await loadContract(address);
+        let contract = await loadContractWithSigner(address);
         try {
             if (isAdmin) {
                 let tx = await contract.afterClosingSession(ethers.utils.parseEther(proposePriceInput.toString()), { from: accounts[0] });
                 tx.wait().then(async () => {
-                    let _finalPrice = await contract.getFinalPrice();
-                    setFinalPrice(ethers.utils.parseEther(_finalPrice))
-                    console.log("finalPrice", ethers.utils.parseEther(_finalPrice));
+                    getSessionDetail();
+                    // getFinalPrice();
                 })
             }
         } catch (error) {
@@ -110,7 +109,7 @@ const SessionDetail = ({ accounts, setAccounts }) => {
                 <article>
                     <div className="row valign-wrapper" style={{ paddingRight: "20px", paddingLeft: "20px" }}>
                         <div className="col s2">
-                            <img src="https://ipfs.infura.io/ipfs/QmdzpEH65BAnv9zHXSAVJKVWPteMTQ4mmPTh4ebALPSwCA" className="circle responsive-img" />
+                            <img src="https://ipfs.infura.io/ipfs/QmdzpEH65BAnv9zHXSAVJKVWPteMTQ4mmPTh4ebALPSwCA" alt="" className="circle responsive-img" />
                         </div>
                         <div className="col s10" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                             <span style={{ fontWeight: "bold", fontSize: "22px" }}>{sessionDetail.productName}</span>
@@ -134,18 +133,24 @@ const SessionDetail = ({ accounts, setAccounts }) => {
                     <div className="propose container " style={{ border: "1px solid gray", borderRadius: "5px", padding: "20px", width: "30vw", marginTop: "50px", boxShadow: "#f95997 0px 0px 1px" }}>
                         {isAdmin ?
                             (
-                                <div className="input-field">
-                                    <input
-                                        id="propose_price"
-                                        type="number"
-                                        className="validate"
-                                        value={proposePriceInput}
-                                        onChange={(e) => setProposedPriceInput(e.target.value)}
-                                    />
-                                    <label className="active" for="propose_price">Price</label>
+                                <div>
 
                                     {state == "0" && <button className="btn pink lighten-5" style={{ color: "#f95997" }} disabled={proposePriceInput < 0} onClick={handleCloseSession}>Close</button>}
-                                    {state == "1" && <button className="btn pink lighten-5" style={{ color: "#f95997" }} disabled={proposePriceInput < 0} onClick={handleFinalPrice}>Set final price</button>}
+                                    {state == "1" &&
+                                        <div>
+                                            <div className="input-field">
+                                                <input
+                                                    id="propose_price"
+                                                    type="number"
+                                                    className="validate"
+                                                    value={proposePriceInput}
+                                                    onChange={(e) => setProposedPriceInput(e.target.value)}
+                                                />
+                                                <label className="active" for="propose_price">Price</label>
+                                            </div>
+                                            <button className="btn pink lighten-5" style={{ color: "#f95997" }} disabled={proposePriceInput < 0} onClick={handleFinalPrice}>Set final price</button>
+                                        </div>
+                                    }
                                     {state == "2" && <button className="btn pink lighten-5" style={{ color: "#f95997" }} disabled>Session has closed</button>}
                                 </div>
                             )
@@ -187,7 +192,9 @@ const SessionDetail = ({ accounts, setAccounts }) => {
                     </div>
                 </div>
             }
-
+            <div>
+                <Carousel images={sessionDetail.productImages} />
+            </div>
         </div>
     );
 }
