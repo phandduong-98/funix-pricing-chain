@@ -44,8 +44,8 @@ contract Session {
         _;
     }
 
-    modifier validParticipant(address _account) {
-        require(_account == msg.sender, "Wrong account");
+    modifier onlyRegistered(address _account) {
+        require(mainContract.getParticipantAccount(_account) != address(0), "Not registered");
         _;
     }
 
@@ -75,7 +75,6 @@ contract Session {
     function getParticipantDeviation(address _account)
         internal
         view
-
         returns (uint256)
     {
         return mainContract.getParticipantDeviation(_account);
@@ -84,14 +83,12 @@ contract Session {
     function getParticipantProposedPrice(address _account)
         public
         view
-        validParticipant(msg.sender)
         returns (uint256)
     {
         return sessionProposes[_account].price;
     }
 
-    function propose(uint256 _price) external validParticipant(msg.sender) {
-
+    function propose(uint256 _price) external onlyRegistered(msg.sender) {
         if (
             sessionProposes[msg.sender].account == address(0) &&
             sessionProposes[msg.sender].price == 0
@@ -104,12 +101,13 @@ contract Session {
             sessionParticipants.push(msg.sender);
         }
         sessionProposes[msg.sender].price = _price;
+        proposedPrice = calculateProposedPrice();
     }
 
     //them only admin
 
-    function calculateProposedPrice() external {
-        // require(state == State.STARTED || state == State.CLOSING, "Wrong state");
+    function calculateProposedPrice() public view returns(uint256) {
+        // require(state == State.OPENED || state == State.CLOSING, "Wrong state");
         require(sessionParticipants.length > 0, "No participant");
         
         uint256 numerator;
@@ -121,23 +119,20 @@ contract Session {
             totalDeviation += mainContract.getParticipantDeviation(sessionParticipants[i]);
         }
         denumerator = (100 * sessionParticipants.length) - totalDeviation;
-        proposedPrice = numerator / denumerator;
+        numerator / denumerator;
+        return numerator / denumerator;
     }
-
 
     function calculateParticipantNewdeviation(uint256 _participantSessionPrice) internal view returns(uint256) {
         require(finalPrice > 0, "No final price");
 
         uint256 diff = finalPrice >= _participantSessionPrice ? (finalPrice - _participantSessionPrice) : (_participantSessionPrice - finalPrice);
-        return (diff * 100) / finalPrice;
+        return ((diff * 100)*10**18 / finalPrice);
     }
 
     function calculateParticipantAccumulatedDeviation(uint256 _currentDeviation, uint256 _numberOfJoinedSession, uint256 _newDeviation) internal pure returns(uint256){      
         return (_currentDeviation * _numberOfJoinedSession + _newDeviation) / (_numberOfJoinedSession + 1);
     }
-
-    //State start bid closing end 
-    //State onging end
 
     function closeSession() external onlyAdmin  {
         state = State.CLOSING;
@@ -145,12 +140,11 @@ contract Session {
 
     function afterClosingSession(uint256 _finalPrice) external onlyAdmin {
         
-        require(_finalPrice > 0, "No final price");
+        require(_finalPrice >= 0, "No final price");
         // set state = closed vao day
         state = State.CLOSED;
 
         finalPrice = _finalPrice;
-        
         // calculate and update dnew + accumulated deviation
         for(uint i=0; i < sessionParticipants.length; i++){
 
@@ -165,7 +159,6 @@ contract Session {
             mainContract.updateParticipantDeviation(currentParticipationAddress, accumulatedDeviation);
         }
 
-        // updateSessionDetail(sessionDetail.productName, sessionDetail.productDescription, sessionDetail.productImages, finalPrice, state);
     }
 
     function getFinalPrice() external view returns(uint256){

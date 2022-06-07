@@ -3,6 +3,7 @@ import { MAIN_CONTRACT_ADDRESS } from './constants';
 import Main from './artifacts/contracts/Main.sol/Main.json';
 import Session from './artifacts/contracts/Session.sol/Session.json';
 
+
 export const loadContractWithProvider = async (contractAddress) => {
     if (typeof window.ethereum !== "undefined") {
         let abi;
@@ -55,3 +56,18 @@ export const toStringState = (state) => {
     if(state === 2) return "Closed";
     return;
 }
+
+export const checkIsRegistered = async () =>{ 
+        let contract = await loadContractWithSigner(MAIN_CONTRACT_ADDRESS);
+        try {
+            console.log("check registeredddddd",  await contract.checkRegistered());
+            return await contract.checkRegistered();
+        } catch (error) {
+            console.log(error);
+            return false;
+        }  
+}
+
+// export const a = async () => {
+//     return "aloo";
+// }

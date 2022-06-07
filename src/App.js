@@ -4,7 +4,7 @@ import Register from './pages/register/Register';
 import Login from './pages/login/Login';
 import Sessions from './pages/sessions/Sessions';
 import AccountDetail from './pages/account_detail/AccountDetail';
-import { BrowserRouter, Link, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Link, Routes, Route, Navigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import SessionDetail from './pages/session_detail/SessionDetail';
 import Accounts from './pages/accounts/Accounts';
@@ -37,6 +37,7 @@ function App() {
           <NavBar accounts={accounts} setAccounts={setAccounts} />
         </nav>
         <Routes>
+          <Route path='/' element={<Navigate to={"/sessions"}/>}/>
           <Route path='/register' element={<Register accounts={accounts} setAccounts={setAccounts} />} />
           <Route path='/login' element={<Login />} />
           <Route path='/sessions/:address' element={<SessionDetail accounts={accounts} setAccounts={setAccounts} />} />

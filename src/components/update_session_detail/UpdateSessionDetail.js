@@ -5,7 +5,7 @@ import { MAIN_CONTRACT_ADDRESS, IMAGE_CID_LENGTH } from '../../constants';
 import { Icon, Button } from 'react-materialize';
 
 
-const CreateNewSession = ({ accounts, setAccounts }) => {
+const UpdateSessionDetail = ({ accounts, setAccounts, sessionAddress, getSessionDetail, setIsUpdateSessionDetail }) => {
     let navigate = useNavigate();
     const isConnected = Boolean(accounts[0]);
 
@@ -16,9 +16,11 @@ const CreateNewSession = ({ accounts, setAccounts }) => {
     const handleSubmit = async () => {
         let contract = await loadContractWithSigner(MAIN_CONTRACT_ADDRESS);
         try {
-            let tx = await contract.createNewSession(productName, productDescription, productImages);
+            let tx = await contract.updateSessionDetail(sessionAddress,productName, productDescription, productImages);
+            console.log("change session detail ...")
             tx.wait().then(() => {
-                navigate("../sessions");
+                getSessionDetail();
+                setIsUpdateSessionDetail(false);
             })
         } catch (error) {
             console.log("Error: ", error);
@@ -59,9 +61,12 @@ const CreateNewSession = ({ accounts, setAccounts }) => {
         </div>
     )
 
+    const handleCancel = () => {
+        setIsUpdateSessionDetail(false);
+    }
+
     return (
-        <div className='create-session container' style={{ border: "1px solid gray", borderRadius: "30px", padding: "20px", width: "30vw", marginTop: "50px", boxShadow: "#f95997 0px 0px 5px" }}>
-            <h4 style={{ color: "#f95997", justifyContent: "center", display: "flex", paddingBottom: "30px" }}>Create New Session</h4>
+        <div className='updates-session'>
             <div class="input-field">
                 <input
                     id="product-name"
@@ -102,8 +107,9 @@ const CreateNewSession = ({ accounts, setAccounts }) => {
                 >
                 </Button>
             </div>
-            <div style={{ justifyContent: "center", display: "flex" }}>
-                <button className='btn' onClick={handleSubmit}>Create</button>
+            <div style={{ justifyContent: "space-between", display: "flex", marginTop: "20px" }}>
+                <button className='btn' onClick={handleSubmit}>Change</button>
+                <button className='btn' onClick={handleCancel}>Cancel</button>
             </div>
 
             {/* <button className='btn' onClick={getParticipants}>Get participants</button> */}
@@ -112,4 +118,4 @@ const CreateNewSession = ({ accounts, setAccounts }) => {
     );
 }
 
-export default CreateNewSession;
+export default UpdateSessionDetail;

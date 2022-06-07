@@ -16,6 +16,7 @@ const Carousel = ({ images }) => {
             console.log(carousel)
             M.Carousel.init(carousel.current, options);
         }
+        console.log("no images");
     }, [images])
 
     return (

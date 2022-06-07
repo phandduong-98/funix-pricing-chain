@@ -12,20 +12,20 @@ const AccountDetail = ({ accounts, setAccounts }) => {
     const [fullName, setFullName] = useState("");
     const [email, setEmail] = useState("");
     const [isEditable, setIsEditable] = useState("");
-    const [isToggle, setIsToggle] = useState(false)
+    const [isChangeInformation, setIsChangeInformation] = useState(false)
 
     const getParticipantDetail = async () => {
         let contract = await loadContractWithSigner(MAIN_CONTRACT_ADDRESS)
-        let _participantsDetail = await contract.getParticipants();
-        let _participantDetail = _participantsDetail.filter(participant => participant.account.toLowerCase() === address.toLowerCase())[0];
+        let _participantDetail = await contract.getParticipant();
         // _participantDetail = [..._participantDetail[0]]
         _participantDetail = {
             account: _participantDetail.account,
             fullName: _participantDetail.fullName,
             email: _participantDetail.email,
             numberOfJoinedSession: _participantDetail.numberOfJoinedSession.toString(),
-            deviation: _participantDetail.deviation.toString()
+            deviation: ethers.utils.formatEther(_participantDetail.deviation)
         }
+        console.log("_participantDetail",_participantDetail);
         setFullName(_participantDetail.fullName)
         setEmail(_participantDetail.email)
         console.log(_participantDetail);
@@ -45,7 +45,7 @@ const AccountDetail = ({ accounts, setAccounts }) => {
 
     const handleChangeInformation = () => {
         setIsEditable(true);
-        setIsToggle(true);
+        setIsChangeInformation(true);
     }
 
     const handleSubmit = async () =>{
@@ -54,7 +54,7 @@ const AccountDetail = ({ accounts, setAccounts }) => {
             let tx = await contract.updateParticipantDetail(fullName, email, {from: accounts[0]}); 
             tx.wait().then(()=>{
                 getParticipantDetail();
-                setIsToggle(false);
+                setIsChangeInformation(false);
                 setIsEditable(false);
             })
         } catch (error) {
@@ -137,8 +137,8 @@ const AccountDetail = ({ accounts, setAccounts }) => {
                         </table>
 
                         <div className="section">
-                            {!isToggle && <button className="btn" onClick={handleChangeInformation}>Change information</button>}
-                            {isToggle && <button className="btn" onClick={handleSubmit}>Submit</button>}
+                            {!isChangeInformation && <button className="btn" onClick={handleChangeInformation}>Change information</button>}
+                            {isChangeInformation && <button className="btn" onClick={handleSubmit}>Submit</button>}
                         </div>
                     </div>
                 )

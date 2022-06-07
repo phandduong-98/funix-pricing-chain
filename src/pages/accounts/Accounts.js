@@ -58,7 +58,7 @@ const Accounts = ({ accounts, setAccounts }) => {
                                         <td>{account.fullName}</td>
                                         <td>{account.email}</td>
                                         <td>{account.numberOfJoinedSession.toString()}</td>
-                                        <td>{account.deviation.toString()}</td>
+                                        <td>{ethers.utils.formatEther(account.deviation)}</td>
                                     </tr>
                                 ))
                             }

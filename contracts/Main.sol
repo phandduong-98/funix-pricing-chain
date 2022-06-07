@@ -41,10 +41,11 @@ contract Main {
         _;
     }
 
-    modifier isNotRegistered() {
-        require(participants[msg.sender].account != msg.sender, "Registered");
-        _;
-    }
+    // modifier isNotRegistered() {
+    //     require(participants[msg.sender].account == address(0), "Registered");
+    //     _;
+    // }
+
 
     function createNewSession(
         string memory _productName,
@@ -67,7 +68,9 @@ contract Main {
     function register(
         string memory _fullName,
         string memory _email
-    ) external isNotRegistered {
+    ) external returns(bool){
+        //only for address that has not registered
+        require(participants[msg.sender].account == address(0), "Registered");
         Participant memory newParticipant = Participant({
             account: msg.sender,
             fullName: _fullName,
@@ -78,6 +81,15 @@ contract Main {
 
         participants[msg.sender] = newParticipant;
         participantKeys.push(msg.sender);
+        return true;
+    }
+
+    function getParticipantAccount(address _account)
+        external
+        view
+        returns (address)
+    {
+        return participants[_account].account;
     }
 
     function getParticipantDeviation(address _account)
@@ -103,17 +115,25 @@ contract Main {
         participants[_account].deviation = _deviation;
     }
 
-    function incrementParticipantNumberOfSession(address _account) external {
+    function incrementParticipantNumberOfSession(address _account) external onlySessionContract(msg.sender){
         participants[_account].numberOfJoinedSession += 1;
     }
 
-    function getParticipants() external view returns(Participant[] memory) {
+    function checkRegistered() external view validParticipant returns (address) {
+        return msg.sender;
+    }
+
+    function getParticipants() external view onlyAdmin returns(Participant[] memory) {
         Participant[] memory _participants = new Participant[](participantKeys.length);
         for(uint256 i=0;i< participantKeys.length;i++){
             Participant memory participant = participants[participantKeys[i]];
             _participants[i] = participant;
         }
         return _participants;
+    }
+
+    function getParticipant() external view returns(Participant memory) {
+        return participants[msg.sender];
     }
 
     function updateSessionDetail(address _sessionAddress,string memory _productName, string memory _productDescription, string[] memory _productImages) public onlyAdmin {
