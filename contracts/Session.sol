@@ -81,14 +81,14 @@ contract Session {
     }
 
     function getParticipantProposedPrice(address _account)
-        public
+        internal
         view
         returns (uint256)
     {
         return sessionProposes[_account].price;
     }
 
-    function propose(uint256 _price) external onlyRegistered(msg.sender) {
+    function propose(uint256 _price) external onlyRegistered(msg.sender) validState(State.OPENED) {
         if (
             sessionProposes[msg.sender].account == address(0) &&
             sessionProposes[msg.sender].price == 0
@@ -107,7 +107,7 @@ contract Session {
     //them only admin
 
     function calculateProposedPrice() public view returns(uint256) {
-        // require(state == State.OPENED || state == State.CLOSING, "Wrong state");
+        require(state == State.OPENED || state == State.CLOSING, "Wrong state");
         require(sessionParticipants.length > 0, "No participant");
         
         uint256 numerator;
@@ -134,11 +134,11 @@ contract Session {
         return (_currentDeviation * _numberOfJoinedSession + _newDeviation) / (_numberOfJoinedSession + 1);
     }
 
-    function closeSession() external onlyAdmin  {
+    function closeSession() external onlyAdmin validState(State.OPENED) {
         state = State.CLOSING;
     }
 
-    function afterClosingSession(uint256 _finalPrice) external onlyAdmin {
+    function afterClosingSession(uint256 _finalPrice) external onlyAdmin validState(State.CLOSING) {
         
         require(_finalPrice >= 0, "No final price");
         // set state = closed vao day
@@ -165,7 +165,7 @@ contract Session {
         return finalPrice;
     }
 
-    function updateSessionDetail(string memory _productName, string memory _productDescription, string[] memory _productImages) external onlyMainContract {
+    function updateSessionDetail(string memory _productName, string memory _productDescription, string[] memory _productImages) external onlyMainContract validState(State.OPENED) {
         productName = _productName;
         productDescription = _productDescription;
         productImages = _productImages;

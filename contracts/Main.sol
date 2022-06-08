@@ -132,7 +132,8 @@ contract Main {
         return _participants;
     }
 
-    function getParticipant() external view returns(Participant memory) {
+    function getParticipant() external view validParticipant returns(Participant memory) {
+
         return participants[msg.sender];
     }
 
