@@ -27,17 +27,17 @@ contract Main {
 
     // Account info of a participant and info of a pricing session will be updated when a user registered, and a pricing session created.
     modifier onlySessionContract(address _session) {
-        require(msg.sender == _session, "Only session");
+        require(msg.sender == _session);
         _;
     }
 
     modifier onlyAdmin() {
-        require(msg.sender == admin, "Only admin");
+        require(msg.sender == admin);
         _;
     }
 
     modifier validParticipant() {
-        require(participants[msg.sender].account != address(0) , "Not register");
+        require(participants[msg.sender].account != address(0));
         _;
     }
 
@@ -133,7 +133,6 @@ contract Main {
     }
 
     function getParticipant() external view validParticipant returns(Participant memory) {
-
         return participants[msg.sender];
     }
 

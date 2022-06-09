@@ -105,18 +105,23 @@ contract Session {
     }
 
     function calculateProposedPrice() public view returns(uint256) {
-        require(state == State.OPENED || state == State.CLOSING);
-        require(sessionParticipants.length > 0);
-        
+        require(sessionParticipants.length > 0, "No participant");
+
         uint256 numerator;
         uint256 denumerator;
         uint256 totalDeviation;
 
         for (uint256 i = 0; i < sessionParticipants.length; i++) {
-            numerator += sessionProposes[sessionParticipants[i]].price * (100*10**18 - mainContract.getParticipantDeviation(sessionParticipants[i]));
-            totalDeviation += mainContract.getParticipantDeviation(sessionParticipants[i]);
+
+            uint256 currentDeviation = mainContract.getParticipantDeviation(sessionParticipants[i]);
+            if(currentDeviation > 100*10**18) {
+                currentDeviation = 100*10**18;
+            }
+            numerator = numerator + (sessionProposes[sessionParticipants[i]].price) * (100*10**18 - (currentDeviation));
+            totalDeviation = ((totalDeviation) + (currentDeviation));
         }
-        denumerator = (100 * sessionParticipants.length)*10**18 - totalDeviation;
+        denumerator = (100 * sessionParticipants.length)*10**18 - (totalDeviation); //100*3 - 200
+        if (denumerator == 0) return 0;
         return numerator / denumerator;
     }
 

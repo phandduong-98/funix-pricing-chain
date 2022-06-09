@@ -58,8 +58,8 @@ const SessionDetail = ({ accounts, setAccounts }) => {
     }
 
     const checkImages = async () => {
-        if (Array.isArray(productImages) && productImages.length) {
-            // array exists and is not empty
+        console.log("Check imagessssssssssssssss",productImages,productImages.length)
+        if (Array.isArray(productImages) && productImages.length>0) {
             setIsImages(true);
             return;
         }
@@ -85,9 +85,13 @@ const SessionDetail = ({ accounts, setAccounts }) => {
             setIsAdmin(_isAdmin);
             if (_isAdmin) calcProposedPrice();
         })
-        checkImages();
+        
 
     }, [accounts])
+
+    useEffect(()=>{
+        checkImages();
+    },[productImages])
 
     const handleSubmit = async () => {
         let contract = await loadContractWithSigner(address);
