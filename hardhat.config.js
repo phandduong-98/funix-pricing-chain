@@ -18,8 +18,9 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
  */
 module.exports = {
 
-  solidity: "0.8.4",
-
+  solidity: {
+    version: "0.8.4",
+  },
   paths: {
     artifacts: './src/artifacts',
   },
@@ -28,5 +29,4 @@ module.exports = {
       chainId: 1337,
     }
   }
-
 };

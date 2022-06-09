@@ -107,8 +107,8 @@ contract Session {
     //them only admin
 
     function calculateProposedPrice() public view returns(uint256) {
-        require(state == State.OPENED || state == State.CLOSING, "Wrong state");
-        require(sessionParticipants.length > 0, "No participant");
+        require(state == State.OPENED || state == State.CLOSING);
+        require(sessionParticipants.length > 0);
         
         uint256 numerator;
         uint256 denumerator;
@@ -124,7 +124,7 @@ contract Session {
     }
 
     function calculateParticipantNewdeviation(uint256 _participantSessionPrice) internal view returns(uint256) {
-        require(finalPrice > 0, "No final price");
+        require(finalPrice > 0);
 
         uint256 diff = finalPrice >= _participantSessionPrice ? (finalPrice - _participantSessionPrice) : (_participantSessionPrice - finalPrice);
         return ((diff * 100)*10**18 / finalPrice);
@@ -140,7 +140,7 @@ contract Session {
 
     function afterClosingSession(uint256 _finalPrice) external onlyAdmin validState(State.CLOSING) {
         
-        require(_finalPrice >= 0, "No final price");
+        require(_finalPrice >= 0);
         // set state = closed vao day
         state = State.CLOSED;
 

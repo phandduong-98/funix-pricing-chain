@@ -3,7 +3,7 @@ const hre = require("hardhat");
 async function main() {
 
     const signers = await hre.ethers.getSigners();
-    const mainContract = await hre.ethers.getContractAt("Main", "0x525C7063E7C20997BaaE9bDa922159152D0e8417");
+    const mainContract = await hre.ethers.getContractAt("Main", "0x5FbDB2315678afecb367f032d93F642f64180aa3");
 
 
     // const session0Address = await main.sessions(0);
