@@ -70,7 +70,7 @@ contract Main {
         string memory _email
     ) external returns(bool){
         //only for address that has not registered
-        require(participants[msg.sender].account == address(0), "Registered");
+        require(participants[msg.sender].account == address(0));
         Participant memory newParticipant = Participant({
             account: msg.sender,
             fullName: _fullName,

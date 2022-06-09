@@ -81,7 +81,7 @@ contract Session {
     }
 
     function getParticipantProposedPrice(address _account)
-        internal
+        public
         view
         returns (uint256)
     {
@@ -104,8 +104,6 @@ contract Session {
         proposedPrice = calculateProposedPrice();
     }
 
-    //them only admin
-
     function calculateProposedPrice() public view returns(uint256) {
         require(state == State.OPENED || state == State.CLOSING);
         require(sessionParticipants.length > 0);
@@ -115,11 +113,10 @@ contract Session {
         uint256 totalDeviation;
 
         for (uint256 i = 0; i < sessionParticipants.length; i++) {
-            numerator += sessionProposes[sessionParticipants[i]].price * (100 - mainContract.getParticipantDeviation(sessionParticipants[i]));
+            numerator += sessionProposes[sessionParticipants[i]].price * (100*10**18 - mainContract.getParticipantDeviation(sessionParticipants[i]));
             totalDeviation += mainContract.getParticipantDeviation(sessionParticipants[i]);
         }
-        denumerator = (100 * sessionParticipants.length) - totalDeviation;
-        numerator / denumerator;
+        denumerator = (100 * sessionParticipants.length)*10**18 - totalDeviation;
         return numerator / denumerator;
     }
 
@@ -141,7 +138,6 @@ contract Session {
     function afterClosingSession(uint256 _finalPrice) external onlyAdmin validState(State.CLOSING) {
         
         require(_finalPrice >= 0);
-        // set state = closed vao day
         state = State.CLOSED;
 
         finalPrice = _finalPrice;

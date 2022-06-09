@@ -45,7 +45,7 @@ const Sessions = ({ accounts }) => {
                     <div style={{ height: "50vh", overflow: "hidden", border: "1px solid gray", borderRadius: "30px", padding: "40px", boxShadow: "#f95997 0px 0px 5px" }}>
                         <div className={`${styles.session_header}`}>
                             <div className={`${styles.session_icon}`}>
-                                <img src="https://ipfs.infura.io/ipfs/QmZY5CJLNAgVVGHbFa4VTfWpCLEd7QqNiR9eGK3etD78Vo" alt="" style={{ borderRadius: "50%", width: "48px", height: "48px", filter: "grayscale(0)" }} />
+                                <img src={`https://ipfs.infura.io/ipfs/${session.productImages[0]}`} alt="" style={{ borderRadius: "50%", width: "48px", height: "48px", filter: "grayscale(0)" }} />
                             </div>
                             <div className={`${styles.session_header_state}`}>
                                 {toStringState(session.state)}
