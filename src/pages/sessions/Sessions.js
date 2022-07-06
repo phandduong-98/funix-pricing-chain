@@ -5,6 +5,7 @@ import styles from "./Sessions.module.css"
 import { MAIN_CONTRACT_ADDRESS } from "../../constants";
 import { useNavigate } from "react-router-dom";
 import M from "materialize-css";
+import no_image from "../../resources/images/No_image_available.png";
 
 const Sessions = ({ accounts }) => {
     const navigate = useNavigate();
@@ -12,16 +13,16 @@ const Sessions = ({ accounts }) => {
 
     useEffect(() => {
 
-        if(accounts){
+        if (accounts) {
             checkIsRegistered().then((result) => {
                 if (!result) {
                     console.log("chua dang ky ban eiiiiiiii");
-                    M.toast({ html: 'Need to register. Redirect to Register ...', classes: 'rounded'})
-                    setTimeout(()=>navigate("/register", { state: { from: "sessions" } }), 4000);
+                    M.toast({ html: 'Need to register. Redirect to Register ...', classes: 'rounded' })
+                    setTimeout(() => navigate("/register", { state: { from: "sessions" } }), 4000);
                 }
             })
         }
-        
+
         const getSessions = async () => {
             let contract = await loadContractWithProvider(MAIN_CONTRACT_ADDRESS);
             try {
@@ -34,8 +35,11 @@ const Sessions = ({ accounts }) => {
         }
         getSessions();
 
-    }, [accounts])
+    }, [accounts]);
 
+    const addDefaultSrc= (ev) => {
+        ev.target.src = no_image;
+    }
 
 
     return (
@@ -45,7 +49,7 @@ const Sessions = ({ accounts }) => {
                     <div style={{ height: "50vh", overflow: "hidden", border: "1px solid gray", borderRadius: "30px", padding: "40px", boxShadow: "#f95997 0px 0px 5px" }}>
                         <div className={`${styles.session_header}`}>
                             <div className={`${styles.session_icon}`}>
-                                <img src={`https://ipfs.infura.io/ipfs/${session.productImages[0]}`} alt="" style={{ borderRadius: "50%", width: "48px", height: "48px", filter: "grayscale(0)" }} />
+                                <img onError={addDefaultSrc} src={`https://ipfs.infura.io/ipfs/${session.productImages[0]}`} alt="" style={{ borderRadius: "50%", width: "48px", height: "48px", filter: "grayscale(0)" }} />
                             </div>
                             <div className={`${styles.session_header_state}`}>
                                 {toStringState(session.state)}
@@ -57,7 +61,7 @@ const Sessions = ({ accounts }) => {
                         </Link>
                     </div>
                 </div>
-            ))):(<div className="container" style={{textAlign:"center",marginTop:"50px",overflow: "hidden", border: "1px solid gray", borderRadius: "30px", padding: "40px", boxShadow: "#f95997 0px 0px 5px" }}><h1 className="pink-text accent-1">Please connect wallet</h1></div>)}
+            ))) : (<div className="container" style={{ textAlign: "center", marginTop: "50px", overflow: "hidden", border: "1px solid gray", borderRadius: "30px", padding: "40px", boxShadow: "#f95997 0px 0px 5px" }}><h1 className="pink-text accent-1">Please connect wallet</h1></div>)}
         </div>
     );
 }

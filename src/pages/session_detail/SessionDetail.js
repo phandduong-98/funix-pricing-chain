@@ -7,6 +7,7 @@ import { isAdmin as checkAdmin } from "../../helper";
 import Carousel from "../../components/carousel/Carousel";
 import M from "materialize-css";
 import UpdateSessionDetail from "../../components/update_session_detail/UpdateSessionDetail";
+import no_image from "../../resources/images/No_image_available.png";
 
 const SessionDetail = ({ accounts, setAccounts }) => {
     const isConnected = Boolean(accounts);
@@ -139,6 +140,9 @@ const SessionDetail = ({ accounts, setAccounts }) => {
             console.log("Error: ", error);
         }
     }
+    const addDefaultSrc= (ev) => {
+        ev.target.src = no_image;
+    }
 
     return (
         <div>
@@ -149,7 +153,7 @@ const SessionDetail = ({ accounts, setAccounts }) => {
                         <article>
                             <div className="row valign-wrapper" style={{ paddingRight: "20px", paddingLeft: "20px" }}>
                                 <div className="col s2">
-                                    <img src={`https://ipfs.infura.io/ipfs/${productImages[0]}`} alt="" className="circle responsive-img" />
+                                    <img onError={addDefaultSrc} src={`https://ipfs.infura.io/ipfs/${productImages[0]}`} alt="" className="circle responsive-img" />
                                 </div>
                                 <div className="col s10" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                                     <span style={{ fontWeight: "bold", fontSize: "22px" }}>{sessionDetail.productName}</span>
