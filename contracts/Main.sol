@@ -11,39 +11,32 @@ contract Main {
     // stores a `Participant` struct for each possible address.
     address[] public participantKeys;
     mapping(address => Participant) public participants;
-
+    mapping(address => bool) public isSession;
     //The smart contract should contain the hash of all the pricing sessions.
     Session[] public sessions;
-    // 
-    // The account deployed the main smart contract will be set as admin account
 
+    // The account deployed the main smart contract will be set as admin account
+    // contract address vs address
     address public admin;
 
     constructor() {
         admin = msg.sender;
     }
 
-    // Account info of a participant and info of a pricing session will be updated when a user registered, and a pricing session created.
-    modifier onlySessionContract(address _session) {
-        require(msg.sender == _session);
-        _;
-    }
-
     modifier onlyAdmin() {
         require(msg.sender == admin);
         _;
     }
-
+    // mentor: dang ko hieu tac dung modifier . Xem lại
     modifier validParticipant() {
-        require(participants[msg.sender].account != address(0));
+        require(participants[msg.sender].account != address(0), "Not registered");
         _;
     }
 
-    // modifier isNotRegistered() {
-    //     require(participants[msg.sender].account == address(0), "Registered");
-    //     _;
-    // }
-
+    modifier onlySessionContract() {
+        require(isSession[msg.sender] == true, "Not session");
+        _;
+    }
 
     function createNewSession(
         string memory _productName,
@@ -60,13 +53,14 @@ contract Main {
             0
         );
         sessions.push(newSession);
+        isSession[address(newSession)] = true;
         return newSession;
     }
 
-    function register(
-        string memory _fullName,
-        string memory _email
-    ) external returns(bool){
+    function register(string memory _fullName, string memory _email)
+        external
+        returns (bool)
+    {
         //only for address that has not registered
         require(participants[msg.sender].account == address(0));
         Participant memory newParticipant = Participant({
@@ -82,76 +76,86 @@ contract Main {
         return true;
     }
 
-    function getParticipantAccount(address _account)
-        external
-        view
-        returns (address)
-    {
-        return participants[_account].account;
-    }
-
-    function getParticipantDeviation(address _account)
-        external
-        view
-        returns (uint256)
-    {
-        return participants[_account].deviation;
-    }
-
-    function getParticipantNumberOfJoinedSession(address _account)
-        external
-        view
-        returns (uint256)
-    {
-        return participants[_account].numberOfJoinedSession;
-    }
-
     function updateParticipantDeviation(address _account, uint256 _deviation)
         external
-        onlySessionContract(msg.sender)
+        onlySessionContract()
     {
         participants[_account].deviation = _deviation;
     }
 
-    function incrementParticipantNumberOfSession(address _account) external onlySessionContract(msg.sender){
+    function incrementParticipantNumberOfSession(address _account)
+        external
+        onlySessionContract()
+    {
         participants[_account].numberOfJoinedSession += 1;
     }
 
-    function checkRegistered() external view validParticipant returns (address) {
+    function checkRegistered()
+        external
+        view
+        validParticipant
+        returns (address)
+    {
         return msg.sender;
     }
 
-    function getParticipants() external view onlyAdmin returns(Participant[] memory) {
-        Participant[] memory _participants = new Participant[](participantKeys.length);
-        for(uint256 i=0;i< participantKeys.length;i++){
+    function getParticipants()
+        external
+        view
+        onlyAdmin
+        returns (Participant[] memory)
+    {
+        Participant[] memory _participants = new Participant[](
+            participantKeys.length
+        );
+        for (uint256 i = 0; i < participantKeys.length; i++) {
             Participant memory participant = participants[participantKeys[i]];
             _participants[i] = participant;
         }
         return _participants;
     }
 
-    function getParticipant() external view validParticipant returns(Participant memory) {
+    function getParticipant()
+        external
+        view
+        validParticipant
+        returns (Participant memory)
+    {
         return participants[msg.sender];
     }
 
-    function updateSessionDetail(address _sessionAddress,string memory _productName, string memory _productDescription, string[] memory _productImages) public onlyAdmin {
+    function updateSessionDetail(
+        address _sessionAddress,
+        string memory _productName,
+        string memory _productDescription,
+        string[] memory _productImages
+    ) public onlyAdmin {
         Session _session = Session(_sessionAddress);
-       _session.updateSessionDetail(_productName,_productDescription,_productImages);
+        _session.updateSessionDetail(
+            _productName,
+            _productDescription,
+            _productImages
+        );
     }
 
+    function getSessions() external view returns (SessionDetail[] memory) {
+        SessionDetail[] memory _sessionsDetail = new SessionDetail[](
+            sessions.length
+        );
 
-    function getSessions() external view returns(SessionDetail[] memory) {
-        SessionDetail[] memory _sessionsDetail = new SessionDetail[](sessions.length);
-
-        for(uint256 i=0;i< sessions.length;i++){
+        for (uint256 i = 0; i < sessions.length; i++) {
             SessionDetail memory sessionDetail = sessions[i].getSessionDetail();
             _sessionsDetail[i] = sessionDetail;
         }
         return _sessionsDetail;
     }
 
-    function updateParticipantDetail(string memory _fullName, string memory _email) public {
-        require(msg.sender == participants[msg.sender].account, "Wrong account");
+    function updateParticipantDetail(
+        string memory _fullName,
+        string memory _email
+    ) public validParticipant {
+        // check logic cu msg.sender == participants[msg.sender].account vô nghĩa . Đã sửa thành:
+        // require(participants[msg.sender].account != address(0), "Not registered");
         participants[msg.sender].fullName = _fullName;
         participants[msg.sender].email = _email;
     }

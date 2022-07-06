@@ -5,7 +5,7 @@ import { MAIN_CONTRACT_ADDRESS, IMAGE_CID_LENGTH } from '../../constants';
 import { Icon, Button } from 'react-materialize';
 
 
-const UpdateSessionDetail = ({ accounts, setAccounts, sessionAddress, getSessionDetail, setIsUpdateSessionDetail }) => {
+const UpdateSessionDetail = ({ accounts, setAccounts, sessionAddress, getSessionDetail, setIsUpdateSessionDetail}) => {
     let navigate = useNavigate();
     const isConnected = Boolean(accounts[0]);
 

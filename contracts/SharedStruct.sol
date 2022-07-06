@@ -15,10 +15,9 @@ struct Participant {
     uint256 deviation;
 }
 
-struct SessionPropose {
-    address account;
-    uint256 price;
-}
+
+
+
 
 struct SessionDetail {
     address sessionAddress;

@@ -34,13 +34,11 @@ const SessionDetail = ({ accounts, setAccounts }) => {
         setState(_state);
         setFinalPrice(ethers.utils.formatEther(_sessionDetail.finalPrice));
         setProductImages(_sessionDetail.productImages);
-        let participantProposedPrice = await contract.getParticipantProposedPrice(accounts[0]);
-        console.log(`participant: ${accounts[0]} proposed price: ${participantProposedPrice.toString()}`);
     }
 
     const getProposedPrice = async () => {
         let contract = await loadContractWithProvider(address)
-        let participantProposedPrice = await contract.getParticipantProposedPrice(accounts[0]);
+        let participantProposedPrice = await contract.sessionProposes(accounts[0]);
         setProposedPrice(ethers.utils.formatEther(participantProposedPrice));
         setProposedPriceInput(ethers.utils.formatEther(participantProposedPrice))
         console.log(`participant: ${accounts[0]} proposed price: ${participantProposedPrice.toString()}`);
@@ -55,15 +53,6 @@ const SessionDetail = ({ accounts, setAccounts }) => {
 
     const getIsAdmin = async () => {
         return await checkAdmin();
-    }
-
-    const checkImages = async () => {
-        console.log("Check imagessssssssssssssss",productImages,productImages.length)
-        if (Array.isArray(productImages) && productImages.length>0) {
-            setIsImages(true);
-            return;
-        }
-        setIsImages(false);
     }
 
     useEffect(() => {
@@ -89,9 +78,9 @@ const SessionDetail = ({ accounts, setAccounts }) => {
 
     }, [accounts])
 
-    useEffect(()=>{
-        checkImages();
-    },[productImages])
+    // useEffect(()=>{
+    //     checkImages();
+    // },[productImages])
 
     const handleSubmit = async () => {
         let contract = await loadContractWithSigner(address);
@@ -216,13 +205,13 @@ const SessionDetail = ({ accounts, setAccounts }) => {
                                             onChange={(e) => setProposedPriceInput(e.target.value)}
                                         />
                                         <label className="active" for="propose_price">Price</label>
-                                        {state == "0" && <button className="btn pink lighten-5" style={{ color: "#f95997" }} disabled={proposePriceInput < 0} onClick={handleSubmit}>Propose</button>}
+                                        {state == "0" && <button className="btn pink lighten-5" style={{ color: "#f95997" }} disabled={proposePriceInput <= 0} onClick={handleSubmit}>Propose</button>}
                                     </div>
                                     )
                                 }
                                 {isUpdateSessionDetail
                                     ?
-                                    <UpdateSessionDetail accounts={accounts} setAccounts={setAccounts} sessionAddress={address} getSessionDetail={getSessionDetail} setIsUpdateSessionDetail={setIsUpdateSessionDetail} />
+                                    <UpdateSessionDetail accounts={accounts} setAccounts={setAccounts} sessionAddress={address} getSessionDetail={getSessionDetail} setIsUpdateSessionDetail={setIsUpdateSessionDetail}/>
                                     :
                                     <div>
                                         <table>
@@ -258,7 +247,7 @@ const SessionDetail = ({ accounts, setAccounts }) => {
                         </div>
                     }
                     <div>
-                        {isImages && <Carousel images={productImages} />}
+                        {Array.isArray(productImages) && productImages.length>0 && <Carousel images={productImages} />}
                     </div>
                 </div>)
                 : (<div className="container" style={{ textAlign: "center", marginTop: "50px", overflow: "hidden", border: "1px solid gray", borderRadius: "30px", padding: "40px", boxShadow: "#f95997 0px 0px 5px" }}><h1 className="pink-text accent-1">Please connect wallet</h1></div>)}
