@@ -200,7 +200,7 @@ const SessionDetail = ({ accounts, setAccounts }) => {
                                         </div>
                                     )
                                     :
-                                    (<div className="input-field">
+                                    (state == "0" && <div className="input-field">
                                         <input
                                             id="propose_price"
                                             type="number"
@@ -215,7 +215,7 @@ const SessionDetail = ({ accounts, setAccounts }) => {
                                 }
                                 {isUpdateSessionDetail
                                     ?
-                                    <UpdateSessionDetail accounts={accounts} setAccounts={setAccounts} sessionAddress={address} getSessionDetail={getSessionDetail} setIsUpdateSessionDetail={setIsUpdateSessionDetail}/>
+                                    <UpdateSessionDetail accounts={accounts} setAccounts={setAccounts} sessionAddress={address} getSessionDetail={getSessionDetail} setIsUpdateSessionDetail={setIsUpdateSessionDetail} _productName={sessionDetail.productName} _productDescription={sessionDetail.productDescription} _productImages={productImages}/>
                                     :
                                     <div>
                                         <table>

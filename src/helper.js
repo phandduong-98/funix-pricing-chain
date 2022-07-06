@@ -1,7 +1,8 @@
 import { ethers } from 'ethers';
-import { MAIN_CONTRACT_ADDRESS } from './constants';
+import { MAIN_CONTRACT_ADDRESS, IMAGE_CID_LENGTH } from './constants';
 import Main from './artifacts/contracts/Main.sol/Main.json';
 import Session from './artifacts/contracts/Session.sol/Session.json';
+import M from "materialize-css";
 
 
 export const loadContractWithProvider = async (contractAddress) => {
@@ -41,7 +42,7 @@ export const isAdmin = async () => {
     if (typeof window.ethereum !== "undefined") {
         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
         const account = accounts[0];
-        if(adminAddress.toLowerCase() === account.toLowerCase()) {
+        if (adminAddress.toLowerCase() === account.toLowerCase()) {
             console.log("is admin");
             return true;
         }
@@ -51,23 +52,71 @@ export const isAdmin = async () => {
 }
 
 export const toStringState = (state) => {
-    if(state === 0) return "Opened";
-    if(state === 1) return "Closing";
-    if(state === 2) return "Closed";
+    if (state === 0) return "Opened";
+    if (state === 1) return "Closing";
+    if (state === 2) return "Closed";
     return;
 }
 
-export const checkIsRegistered = async () =>{ 
-        let contract = await loadContractWithSigner(MAIN_CONTRACT_ADDRESS);
-        try {
-            console.log("check registeredddddd",  await contract.checkRegistered());
-            return await contract.checkRegistered();
-        } catch (error) {
-            console.log(error);
-            return false;
-        }  
+export const checkIsRegistered = async () => {
+    let contract = await loadContractWithSigner(MAIN_CONTRACT_ADDRESS);
+    try {
+        console.log("check registeredddddd", await contract.checkRegistered());
+        return await contract.checkRegistered();
+    } catch (error) {
+        console.log(error);
+        return false;
+    }
 }
 
+export const validateEmail = (email) => {
+    return email.match(
+        /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+    );
+}
+
+export const validateRegister = (fullname, email) => {
+    if (email === "" && fullname == "") {
+        M.toast({ html: 'Require name and email', classes: 'rounded' });
+        return false;
+    }
+    if (fullname === "") {
+        M.toast({ html: 'Require name', classes: 'rounded' });
+        return false;
+    }
+    if (email === "") {
+        M.toast({ html: 'Require email', classes: 'rounded' });
+        return false;
+    }
+    if (!validateEmail(email)) {
+        M.toast({ html: 'Wrong email format', classes: 'rounded' });
+        return false;
+    }
+    return true;
+};
+
+export const validateSession = (productName,productDescription, productImages) =>{
+    if (productName === "" && productDescription == "") {
+        M.toast({ html: 'Require productName and productDescription', classes: 'rounded' });
+        return false;
+    }
+    if (productName === "") {
+        M.toast({ html: 'Require productName', classes: 'rounded' });
+        return false;
+    }
+    if (productDescription === "") {
+        M.toast({ html: 'Require productDescription', classes: 'rounded' });
+        return false;
+    }
+    if (productImages.some((element) => !element || element.length !== IMAGE_CID_LENGTH)) 
+    {
+        M.toast({ html: 'Require image hash', classes: 'rounded' });
+        return false;
+    }
+    return true;
+}
+
+// export
 // export const a = async () => {
 //     return "aloo";
 // }

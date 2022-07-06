@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { checkIsRegistered, loadContractWithProvider, loadContractWithSigner } from '../../helper';
+import { checkIsRegistered, loadContractWithSigner, validateRegister } from '../../helper';
 import { MAIN_CONTRACT_ADDRESS } from '../../constants';
 import { useLocation, useNavigate } from 'react-router-dom';
 import M from 'materialize-css';
@@ -18,13 +18,13 @@ const Register = ({ accounts, setAccounts }) => {
     // }, [accounts]);
 
 
-    useEffect(()=>{
-        if(accounts){
+    useEffect(() => {
+        if (accounts) {
             checkIsRegistered().then((result) => {
                 if (result) {
                     console.log("dang ky roi ban eiii");
-                    M.toast({ html: 'This address has registered. Redirect to account ...', classes: 'rounded'})
-                    setTimeout(()=>navigate(`/accounts/${accounts[0]}`, { state: { from: "sessions" } }), 4000);
+                    M.toast({ html: 'This address has registered. Redirect to account ...', classes: 'rounded' })
+                    setTimeout(() => navigate(`/accounts/${accounts[0]}`, { state: { from: "sessions" } }), 4000);
                 }
             })
         }
@@ -33,10 +33,7 @@ const Register = ({ accounts, setAccounts }) => {
     const handleSubmit = async () => {
         let contract = await loadContractWithSigner(MAIN_CONTRACT_ADDRESS);
         try {
-            if (email === "" && name == "") return M.toast({ html: 'Require name and email', classes: 'rounded' });
-            if (name === "") return M.toast({ html: 'Require name', classes: 'rounded' });
-            if (email === "") return M.toast({ html: 'Require email', classes: 'rounded' });
-
+            if(!validateRegister(name,email)) return;
             let tx = await contract.register(name, email, { from: accounts[0] });
             tx.wait().then((result) => {
                 if (result) {
@@ -48,6 +45,9 @@ const Register = ({ accounts, setAccounts }) => {
             console.log("Error: ", error);
         }
     }
+
+
+
 
     return (
 
@@ -70,7 +70,7 @@ const Register = ({ accounts, setAccounts }) => {
                 <div class="input-field">
                     <input
                         id="email"
-                        type="text"
+                        type="email"
                         class="validate"
                         required
                         value={email}

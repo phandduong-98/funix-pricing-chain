@@ -1,13 +1,13 @@
-import { loadContractWithProvider, loadContractWithSigner, toStringState } from "../../helper";
+import { validateRegister, loadContractWithSigner } from "../../helper";
 import { ethers } from "ethers";
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { MAIN_CONTRACT_ADDRESS } from "../../constants";
-import { Divider } from "react-materialize";
+
 const AccountDetail = ({ accounts, setAccounts }) => {
     let isConnected = Boolean(accounts);
     let navigate = useNavigate();
-    const { address } = useParams();
+    // const { address } = useParams();
     const [participantDetail, setParticipantDetail] = useState({});
     const [fullName, setFullName] = useState("");
     const [email, setEmail] = useState("");
@@ -17,7 +17,6 @@ const AccountDetail = ({ accounts, setAccounts }) => {
     const getParticipantDetail = async () => {
         let contract = await loadContractWithSigner(MAIN_CONTRACT_ADDRESS)
         let _participantDetail = await contract.getParticipant();
-        // _participantDetail = [..._participantDetail[0]]
         _participantDetail = {
             account: _participantDetail.account,
             fullName: _participantDetail.fullName,
@@ -51,6 +50,7 @@ const AccountDetail = ({ accounts, setAccounts }) => {
     const handleSubmit = async () =>{
         let contract = await loadContractWithSigner(MAIN_CONTRACT_ADDRESS);
         try {
+            if(!validateRegister(fullName,email)) return;
             let tx = await contract.updateParticipantDetail(fullName, email, {from: accounts[0]}); 
             tx.wait().then(()=>{
                 getParticipantDetail();
@@ -95,7 +95,7 @@ const AccountDetail = ({ accounts, setAccounts }) => {
                                         isEditable
                                             ?
                                             (<td className="input-field">
-                                                    <input 
+                                                    <input
                                                         value={fullName} 
                                                         id="full-name" 
                                                         type="text" 

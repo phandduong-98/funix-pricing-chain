@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { loadContractWithProvider, loadContractWithSigner } from '../../helper';
+import { validateSession, loadContractWithSigner } from '../../helper';
 import { MAIN_CONTRACT_ADDRESS, IMAGE_CID_LENGTH } from '../../constants';
 import { Icon, Button } from 'react-materialize';
+import M from "materialize-css";
+import { useEffect } from 'react';
+import ImageInputField from '../image_input_field/ImageInputField';
 
-
-const UpdateSessionDetail = ({ accounts, setAccounts, sessionAddress, getSessionDetail, setIsUpdateSessionDetail}) => {
+const UpdateSessionDetail = ({ accounts, setAccounts, sessionAddress, getSessionDetail, setIsUpdateSessionDetail, _productName, _productDescription, _productImages }) => {
     let navigate = useNavigate();
     const isConnected = Boolean(accounts[0]);
 
@@ -16,7 +18,10 @@ const UpdateSessionDetail = ({ accounts, setAccounts, sessionAddress, getSession
     const handleSubmit = async () => {
         let contract = await loadContractWithSigner(MAIN_CONTRACT_ADDRESS);
         try {
-            let tx = await contract.updateSessionDetail(sessionAddress,productName, productDescription, productImages);
+            if (!validateSession(productName, productDescription, productImages)) return;
+            // if (productImages.some((element) => !element || element.length !== IMAGE_CID_LENGTH)) return M.toast({ html: 'Require image hash', classes: 'rounded' });
+
+            let tx = await contract.updateSessionDetail(sessionAddress, productName, productDescription, productImages);
             console.log("change session detail ...")
             tx.wait().then(() => {
                 getSessionDetail();
@@ -27,43 +32,15 @@ const UpdateSessionDetail = ({ accounts, setAccounts, sessionAddress, getSession
         }
     }
 
-    const handleAddImage = () => {
-        console.log("product images", productImages);
-        if (productImages.some((element) => !element || element.length !== IMAGE_CID_LENGTH)) return;
-
-        console.log("add imageeeeeeeeeeeee");
-        let tempArray = [...productImages];
-        tempArray.push("");
-        setProductImages(tempArray);
-    }
-
-    const handleImageChange = (e, index) => {
-        let val = e.target.value;
-        console.log("change", val);
-        let imageArray = [...productImages];
-        imageArray[index] = val;
-        setProductImages(imageArray);
-    }
-
-    const handleImageInputField = productImages && productImages.map((image, index) =>
-        <div class="input-field" key={index}>
-            <input
-                id={`product-image-${index}`}
-                type="text"
-                class="validate"
-                required
-                value={image}
-                onChange={(e) => {
-                    handleImageChange(e, index);
-                }}
-            />
-            <label for={`product-image-${index}`}>{`Image ${index}`}</label>
-        </div>
-    )
-
     const handleCancel = () => {
         setIsUpdateSessionDetail(false);
     }
+
+    useEffect(() => {
+        setProductName(_productName);
+        setProductDescription(_productDescription);
+        setProductImages(_productImages);
+    }, [])
 
     return (
         <div className='updates-session'>
@@ -73,9 +50,11 @@ const UpdateSessionDetail = ({ accounts, setAccounts, sessionAddress, getSession
                     type="text"
                     class="validate"
                     value={productName}
-                    onChange={(e) => setProductName(e.target.value)}
+                    onChange={
+                        (e) => setProductName(e.target.value)
+                    }
                 />
-                <label for="product-name">Product Name</label>
+                <label class="active" for="product-name">Product Name</label>
             </div>
 
             <div class="input-field">
@@ -87,26 +66,12 @@ const UpdateSessionDetail = ({ accounts, setAccounts, sessionAddress, getSession
                     value={productDescription}
                     onChange={(e) => setProductDescription(e.target.value)}
                 />
-                <label for="product-description">Product Description</label>
-            </div>
-            {
-                handleImageInputField
-            }
-            <div>
-                <Button
-                    className=""
-                    floating
-                    node="button"
-                    tooltip="Add image"
-                    icon={<Icon>add</Icon>}
-                    tooltipOptions={{
-                        position: 'right'
-                    }}
-                    waves="light"
-                    onClick={handleAddImage}
-                >
-                </Button>
-            </div>
+                <label className="active" for="product-description">Product Description</label>
+                <div className='image-input-field'>
+                    </div>
+                    <ImageInputField productImages={productImages} setProductImages={setProductImages}/>
+                </div>
+                
             <div style={{ justifyContent: "space-between", display: "flex", marginTop: "20px" }}>
                 <button className='btn' onClick={handleSubmit}>Change</button>
                 <button className='btn' onClick={handleCancel}>Cancel</button>
