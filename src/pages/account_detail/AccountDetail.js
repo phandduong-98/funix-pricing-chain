@@ -24,10 +24,8 @@ const AccountDetail = ({ accounts, setAccounts }) => {
             numberOfJoinedSession: _participantDetail.numberOfJoinedSession.toString(),
             deviation: ethers.utils.formatEther(_participantDetail.deviation)
         }
-        console.log("_participantDetail",_participantDetail);
         setFullName(_participantDetail.fullName)
         setEmail(_participantDetail.email)
-        console.log(_participantDetail);
         setParticipantDetail(_participantDetail);
     }
 

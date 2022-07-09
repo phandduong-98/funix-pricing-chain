@@ -15,7 +15,6 @@ const Accounts = ({ accounts, setAccounts }) => {
         try {
             let _accountList = await contract.getParticipants();
             setAccountList(_accountList);
-            console.log(_accountList);
         } catch (error) {
             console.log("Error: ", error);
         }

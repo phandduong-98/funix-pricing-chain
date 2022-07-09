@@ -22,8 +22,7 @@ const Register = ({ accounts, setAccounts }) => {
         if (accounts) {
             checkIsRegistered().then((result) => {
                 if (result) {
-                    console.log("dang ky roi ban eiii");
-                    M.toast({ html: 'This address has registered. Redirect to account ...', classes: 'rounded' })
+                    M.toast({html: 'This address has registered. Redirect to account ...', classes: 'rounded'})
                     setTimeout(() => navigate(`/accounts/${accounts[0]}`, { state: { from: "sessions" } }), 4000);
                 }
             })
@@ -33,11 +32,10 @@ const Register = ({ accounts, setAccounts }) => {
     const handleSubmit = async () => {
         let contract = await loadContractWithSigner(MAIN_CONTRACT_ADDRESS);
         try {
-            if(!validateRegister(name,email)) return;
+            if (!validateRegister(name, email)) return;
             let tx = await contract.register(name, email, { from: accounts[0] });
             tx.wait().then((result) => {
                 if (result) {
-                    console.log("dang ky ok r day ban eiiiii, to the mooon nhung ma la ba chu o");
                     navigate("/sessions");
                 }
             })

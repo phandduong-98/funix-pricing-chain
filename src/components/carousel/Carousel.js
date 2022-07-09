@@ -13,10 +13,8 @@ const Carousel = ({ images }) => {
                 indicators: true
 
             };
-            console.log(carousel)
             M.Carousel.init(carousel.current, options);
         }
-        console.log("no images");
     }, [images])
 
     return (

@@ -3,23 +3,19 @@ import { IMAGE_CID_LENGTH } from '../../constants';
 
 const ImageInputField = ({productImages, setProductImages}) => {
     const handleAddImage = () => {
-        console.log("product images", productImages);
         if (productImages.some((element) => !element || element.length !== IMAGE_CID_LENGTH)) return;
-        console.log("add imageeeeeeeeeeeee");
         let tempArray = [...productImages];
         tempArray.push("");
         setProductImages(tempArray);
     }
 
     const handleRemoveImage = (index) => {
-        console.log("product images", productImages);
         let [removedImage = productImages[index], ...tempArray] = productImages;
         setProductImages(tempArray);
     }
 
     const handleImageChange = (e, index) => {
         let val = e.target.value;
-        console.log("change", val);
         let imageArray = [...productImages];
         imageArray[index] = val;
         setProductImages(imageArray);

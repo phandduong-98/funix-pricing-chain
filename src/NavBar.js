@@ -29,7 +29,6 @@ const NavBar = ({accounts, setAccounts}) => {
     }
 
     const handleDisconnect = () => { 
-        console.log("disconnect")
         setAccounts(null)
         isConnected = false;
         // navigate('/sessions')
@@ -47,10 +46,7 @@ const NavBar = ({accounts, setAccounts}) => {
         var elems = document.querySelectorAll('.dropdown-trigger');
         const options = {
             inDuration: 150,
-            hover: true,
-            onCycleTo: () => {
-                console.log("New Slide");
-            }
+            hover: true
         }
         var instances = M.Dropdown.init(elems, options);
         getIsAdmin().then((_isAdmin) => setIsAdmin(_isAdmin));

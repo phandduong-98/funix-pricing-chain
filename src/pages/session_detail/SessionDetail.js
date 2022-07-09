@@ -28,9 +28,7 @@ const SessionDetail = ({ accounts, setAccounts }) => {
     const getSessionDetail = async () => {
         let contract = await loadContractWithProvider(address)
         let _sessionDetail = await contract.getSessionDetail();
-        console.log("_sessionDetail", _sessionDetail);
         setSessionDetail(_sessionDetail);
-        console.log(accounts[0])
         let _state = _sessionDetail.state;
         setState(_state);
         setFinalPrice(ethers.utils.formatEther(_sessionDetail.finalPrice));
@@ -42,14 +40,12 @@ const SessionDetail = ({ accounts, setAccounts }) => {
         let participantProposedPrice = await contract.sessionProposes(accounts[0]);
         setProposedPrice(ethers.utils.formatEther(participantProposedPrice));
         setProposedPriceInput(ethers.utils.formatEther(participantProposedPrice))
-        console.log(`participant: ${accounts[0]} proposed price: ${participantProposedPrice.toString()}`);
     }
 
     const getFinalPrice = async () => {
         let contract = await loadContractWithProvider(address)
         let _finalPrice = await contract.getFinalPrice();
         setFinalPrice(ethers.utils.formatEther(_finalPrice));
-        console.log("final price", ethers.utils.formatEther(_finalPrice));
     }
 
     const getIsAdmin = async () => {
@@ -60,13 +56,11 @@ const SessionDetail = ({ accounts, setAccounts }) => {
         if (accounts) {
             checkIsRegistered().then((result) => {
                 if (!result) {
-                    console.log("chua dang ky ban eiiiiiiii");
                     M.toast({ html: 'Need to register. Redirect to Register ...', classes: 'rounded' })
                     setTimeout(() => navigate("/register", { state: { from: "sessions" } }), 4000);
                 }
             })
         }
-        console.log("session address: ", address);
         if (!accounts) return;
         getSessionDetail();
         getProposedPrice();
@@ -86,7 +80,6 @@ const SessionDetail = ({ accounts, setAccounts }) => {
     const handleSubmit = async () => {
         let contract = await loadContractWithSigner(address);
         try {
-            console.log("proposePriceInput", proposePriceInput);
             let tx = await contract.propose(ethers.utils.parseEther(proposePriceInput.toString()), { from: accounts[0] });
             tx.wait().then(() => {
                 getProposedPrice();
@@ -103,7 +96,6 @@ const SessionDetail = ({ accounts, setAccounts }) => {
                 let tx = await contract.closeSession({ from: accounts[0] });
                 tx.wait().then(async () => {
                     let _state = await contract.state()
-                    console.log(_state);
                     setState(_state);
                 })
             }
@@ -213,7 +205,7 @@ const SessionDetail = ({ accounts, setAccounts }) => {
                                     </div>
                                     )
                                 }
-                                {isUpdateSessionDetail
+                                {isUpdateSessionDetail && isAdmin
                                     ?
                                     <UpdateSessionDetail accounts={accounts} setAccounts={setAccounts} sessionAddress={address} getSessionDetail={getSessionDetail} setIsUpdateSessionDetail={setIsUpdateSessionDetail} _productName={sessionDetail.productName} _productDescription={sessionDetail.productDescription} _productImages={productImages}/>
                                     :

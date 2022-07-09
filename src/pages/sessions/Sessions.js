@@ -16,7 +16,6 @@ const Sessions = ({ accounts }) => {
         if (accounts) {
             checkIsRegistered().then((result) => {
                 if (!result) {
-                    console.log("chua dang ky ban eiiiiiiii");
                     M.toast({ html: 'Need to register. Redirect to Register ...', classes: 'rounded' })
                     setTimeout(() => navigate("/register", { state: { from: "sessions" } }), 4000);
                 }
@@ -28,7 +27,6 @@ const Sessions = ({ accounts }) => {
             try {
                 let _sessions = await contract.getSessions();
                 setSessions(_sessions);
-                console.log(_sessions);
             } catch (error) {
                 console.log("Error: ", error);
             }

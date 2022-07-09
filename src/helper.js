@@ -43,11 +43,9 @@ export const isAdmin = async () => {
         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
         const account = accounts[0];
         if (adminAddress.toLowerCase() === account.toLowerCase()) {
-            console.log("is admin");
             return true;
         }
     }
-    console.log("not admin");
     return false;
 }
 
@@ -61,7 +59,6 @@ export const toStringState = (state) => {
 export const checkIsRegistered = async () => {
     let contract = await loadContractWithSigner(MAIN_CONTRACT_ADDRESS);
     try {
-        console.log("check registeredddddd", await contract.checkRegistered());
         return await contract.checkRegistered();
     } catch (error) {
         console.log(error);

@@ -22,7 +22,6 @@ const UpdateSessionDetail = ({ accounts, setAccounts, sessionAddress, getSession
             // if (productImages.some((element) => !element || element.length !== IMAGE_CID_LENGTH)) return M.toast({ html: 'Require image hash', classes: 'rounded' });
 
             let tx = await contract.updateSessionDetail(sessionAddress, productName, productDescription, productImages);
-            console.log("change session detail ...")
             tx.wait().then(() => {
                 getSessionDetail();
                 setIsUpdateSessionDetail(false);
