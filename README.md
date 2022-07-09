@@ -4,6 +4,14 @@ This project demonstrates a basic Hardhat use case. It comes with a sample contr
 
 Try running some of the following tasks:
 
+0. npm start
+
+1. npx hardhat node (if use hardhat localhost)
+
+2. npx hardhat run --network ./script/deploy.js
+
+3. Change "MAIN_CONTRACT_ADDRESS" in "constants.js" to deployed contract address
+
 ```shell
 npx hardhat accounts
 npx hardhat compile
