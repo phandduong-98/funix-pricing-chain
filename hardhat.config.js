@@ -30,6 +30,10 @@ module.exports = {
     artifacts: './src/artifacts',
   },
   networks: {
+    localhost: {
+      url: "http://127.0.0.1:8545/",
+      chainId: 1337
+    },
     rinkeby: {
       url: "https://rinkeby.infura.io/v3/55867bd197074467b5c7693ab56c398c",
       accounts : accounts
