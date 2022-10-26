@@ -10,9 +10,10 @@ import SessionDetail from './pages/session_detail/SessionDetail';
 import Accounts from './pages/accounts/Accounts';
 import { ethers } from "ethers";
 import CreateNewSession from './pages/create_new_session/CreateNewSession';
-
+import SessionsList from "./pages/SessionsList/SessionsList";
+import { sessionsCtx, SessionContext} from "./context/SessionContext";
+import { useContext } from "react";
 function App() {
-
   const [accounts, setAccounts] = useState("");
 
   const requestAccounts = async () => {
@@ -37,15 +38,15 @@ function App() {
           <NavBar accounts={accounts} setAccounts={setAccounts} />
         </nav>
         <Routes>
-          <Route path='/' element={<Navigate to={"/sessions"}/>}/>
-          <Route path='/register' element={<Register accounts={accounts} setAccounts={setAccounts} />} />
-          <Route path='/login' element={<Login />} />
-          <Route path='/sessions/:address' element={<SessionDetail accounts={accounts} setAccounts={setAccounts} />} />
-          <Route path='/sessions' element={<Sessions accounts={accounts} setAccounts={setAccounts} />} />
-          <Route path='/accounts/:address' element={<AccountDetail accounts={accounts} setAccounts={setAccounts} />} />
-          <Route path='/accounts' element={<Accounts accounts={accounts} setAccounts={setAccounts} />} />
-          <Route path='/create-session' element={<CreateNewSession accounts={accounts} setAccounts={setAccounts} />} />
-
+            <Route path='/' element={<Navigate to={"/sessions"}/>}/>
+            <Route path='/register' element={<Register accounts={accounts} setAccounts={setAccounts} />} />
+            <Route path='/login' element={<Login />} />
+            <Route path='/sessions/:address' element={<SessionDetail accounts={accounts} setAccounts={setAccounts} />} />
+            <Route path='/sessions' element={<Sessions accounts={accounts} setAccounts={setAccounts} />} />
+            <Route path='/accounts/:address' element={<AccountDetail accounts={accounts} setAccounts={setAccounts} />} />
+            <Route path='/accounts' element={<Accounts accounts={accounts} setAccounts={setAccounts} />} />
+            <Route path='/create-session' element={<CreateNewSession accounts={accounts} setAccounts={setAccounts} />} />
+            <Route path='/sessionsList' element={<SessionsList accounts={accounts} setAccounts={setAccounts} />} />  
         </Routes>
       </BrowserRouter>
     </div>

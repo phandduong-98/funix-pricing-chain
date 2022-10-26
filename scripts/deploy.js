@@ -1,7 +1,7 @@
 
 const hre = require("hardhat");
 const fs = require('fs-extra')
-
+// const {run, network} = require("hardhat")
 const contractAddresses = require("../contractAddresses.json")
 
 let isDone = false;
@@ -14,17 +14,6 @@ async function main() {
   await main.deployed();
   console.log("Main deployed to:", main.address);
 
-
-  console.log(contractAddresses);
-
-  fs.writeJSON("contractAddresses.json", {"MAIN_CONTRACT_ADDRESS": main.address}, (err) => {
-    isDone = true;
-    if (err) return console.log(err);
-    console.log(JSON.stringify(contractAddresses));
-    console.log('writing to ' + contractAddresses.json);
-  });
-
-  console.log("waited");
 }
 
 

@@ -3,7 +3,6 @@ pragma solidity ^0.8.0;
 
 enum State {
     OPENED,
-    CLOSING,
     CLOSED
 }
 
@@ -15,15 +14,12 @@ struct Participant {
     uint256 deviation;
 }
 
-
-
-
-
 struct SessionDetail {
     address sessionAddress;
     string productName;
     string productDescription;
     string[] productImages;
     uint256 finalPrice;
+    uint256 proposedPrice;
     State state;
 }

@@ -28,8 +28,12 @@ contract Session {
     Main public mainContract;
     State public state; //
 
+    // //timer
+    uint256 private immutable i_startTime;
+    uint256 private sessionDuration;
+
     modifier onlyAdmin() {
-        require(msg.sender == admin, "Only admin");
+        require(msg.sender == admin, "only admin");
         _;
     }
     modifier onlyMainContract() {
@@ -55,7 +59,8 @@ contract Session {
         string memory _productDescription,
         string[] memory _productImages,
         uint256 _proposedPrice,
-        uint256 _finalPrice
+        uint256 _finalPrice,
+        uint256 _sessionDuration
     ) {
         mainContract = Main(_mainContract);
         admin = _admin;
@@ -65,17 +70,30 @@ contract Session {
         productImages = _productImages;
         finalPrice = _finalPrice;
         state = State.OPENED;
+        // //initialize timer
+        i_startTime = block.timestamp;
+        sessionDuration = _sessionDuration;
     }
 
-
     // cần update # session join ngay lần đầu propose???
+    // sessionDuration = 0 => no time limit for session => admin need to close session
+    // sessionDuration > 0 => time limit for session => can only propose in time limit
+    // let user change state???
+    // flow : if sessionDuration = 0 => no require time limit else require time limit
     function propose(uint256 _price)
         external
         onlyRegistered
         validState(State.OPENED)
     {
-        require(sessionParticipants.length < 10, "Participants need to be less than 10");
         require(_price > 0, "Price must greater than 0");
+        require(
+            sessionParticipants.length < 10,
+            "Participants need to be less than 10"
+        );
+        if(sessionDuration > 0){
+            require(block.timestamp <= i_startTime + sessionDuration, "Session is closed");
+        }
+
         sessionProposes[msg.sender] = _price;
         sessionParticipants.push(msg.sender);
         proposedPrice = calculateProposedPrice();
@@ -131,14 +149,11 @@ contract Session {
             (_numberOfJoinedSession + 1);
     }
 
-    function closeSession() external onlyAdmin validState(State.OPENED) {
-        state = State.CLOSING;
-    }
-
     function afterClosingSession(uint256 _finalPrice)
         external
         onlyAdmin
-        validState(State.CLOSING)
+        // validState(State.CLOSING)
+        validState(State.OPENED)
     {
         require(_finalPrice >= 0);
         state = State.CLOSED;
@@ -163,13 +178,13 @@ contract Session {
                     _deviation,
                     _numberOfJoinedSession,
                     newDeviation
-            );
+                );
 
             mainContract.updateParticipantDeviation(
                 sessionParticipants[i],
                 accumulatedDeviation
             );
-            
+
             mainContract.incrementParticipantNumberOfSession(
                 sessionParticipants[i]
             );
@@ -197,8 +212,19 @@ contract Session {
             productDescription: productDescription,
             productImages: productImages,
             finalPrice: finalPrice,
+            proposedPrice: proposedPrice,
             state: state
         });
         return _sessionDetail;
     }
+
+    function getStartTime() external view returns (uint256) {
+        return i_startTime;
+    }
+
+    function getSessionDuration() external view returns (uint256) {
+        return sessionDuration;
+    }
+
+
 }

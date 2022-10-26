@@ -1,18 +1,18 @@
 import { Link } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { loadContractWithProvider, toStringState, checkIsRegistered } from "../../helper";
 import styles from "./Sessions.module.css"
 import { MAIN_CONTRACT_ADDRESS } from "../../constants";
 import { useNavigate } from "react-router-dom";
 import M from "materialize-css";
 import no_image from "../../resources/images/No_image_available.png";
+import SessionState from "./SessionState";
 
 const Sessions = ({ accounts }) => {
     const navigate = useNavigate();
     const [sessions, setSessions] = useState([]);
-
+    
     useEffect(() => {
-
         if (accounts) {
             checkIsRegistered().then((result) => {
                 if (!result) {
@@ -32,13 +32,11 @@ const Sessions = ({ accounts }) => {
             }
         }
         getSessions();
-
     }, [accounts]);
 
     const addDefaultSrc= (ev) => {
         ev.target.src = no_image;
     }
-
 
     return (
         <div className="session-list row">
@@ -50,7 +48,7 @@ const Sessions = ({ accounts }) => {
                                 <img onError={addDefaultSrc} src={`https://ipfs.infura.io/ipfs/${session.productImages[0]}`} alt="" style={{ borderRadius: "50%", width: "48px", height: "48px", filter: "grayscale(0)" }} />
                             </div>
                             <div className={`${styles.session_header_state}`}>
-                                {toStringState(session.state)}
+                                <SessionState sessionAddress={session.sessionAddress} sessionState={session.state}/>
                             </div>
                         </div>
                         <Link to={`/sessions/${session.sessionAddress}`}>

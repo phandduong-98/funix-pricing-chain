@@ -46,6 +46,7 @@ const AccountDetail = ({ accounts, setAccounts }) => {
     }
 
     const handleSubmit = async () =>{
+
         let contract = await loadContractWithSigner(MAIN_CONTRACT_ADDRESS);
         try {
             if(!validateRegister(fullName,email)) return;

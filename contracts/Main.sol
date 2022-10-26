@@ -5,10 +5,7 @@ import "./Session.sol";
 import "./SharedStruct.sol";
 
 contract Main {
-    /*
-        The00-Main.sol file should contain information of each participant, including account, full name, email, number of pricing session he has joined, and deviation 
-    */
-    // stores a `Participant` struct for each possible address.
+
     address[] public participantKeys;
     mapping(address => Participant) public participants;
     mapping(address => bool) public isSession;
@@ -27,7 +24,6 @@ contract Main {
         require(msg.sender == admin);
         _;
     }
-    // mentor: dang ko hieu tac dung modifier . Xem lại
     modifier validParticipant() {
         require(participants[msg.sender].account != address(0), "Not registered");
         _;
@@ -41,7 +37,8 @@ contract Main {
     function createNewSession(
         string memory _productName,
         string memory _productDescription,
-        string[] memory _productImages
+        string[] memory _productImages,
+        uint256 _sessionDuration
     ) external onlyAdmin returns (Session) {
         Session newSession = new Session(
             address(this),
@@ -50,7 +47,8 @@ contract Main {
             _productDescription,
             _productImages,
             0,
-            0
+            0,
+            _sessionDuration
         );
         sessions.push(newSession);
         isSession[address(newSession)] = true;
@@ -154,8 +152,6 @@ contract Main {
         string memory _fullName,
         string memory _email
     ) public validParticipant {
-        // check logic cu msg.sender == participants[msg.sender].account vô nghĩa . Đã sửa thành:
-        // require(participants[msg.sender].account != address(0), "Not registered");
         participants[msg.sender].fullName = _fullName;
         participants[msg.sender].email = _email;
     }

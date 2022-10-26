@@ -50,10 +50,16 @@ export const isAdmin = async () => {
 }
 
 export const toStringState = (state) => {
-    if (state === 0) return "Opened";
-    if (state === 1) return "Closing";
-    if (state === 2) return "Closed";
+    if (state == 0) return "Opened";
+    if (state == 1) return "Closed";
     return;
+}
+
+export const getCurrentTimestamp = async () => {
+    const provider = new ethers.providers.JsonRpcProvider("https://bscrpc.com");
+    const blockNumber = await provider.getBlockNumber();
+    const timestamp = (await provider.getBlock(blockNumber)).timestamp;
+    return timestamp;
 }
 
 export const checkIsRegistered = async () => {

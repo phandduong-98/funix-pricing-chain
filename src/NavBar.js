@@ -70,7 +70,7 @@ const NavBar = ({accounts, setAccounts}) => {
             <ul class="left hide-on-med-and-down">
                 <li > <Link to={'/sessions'}>Sessions</Link></li>
                 {isAdmin && <li > <Link to={'/accounts'}>Accounts</Link></li>}
-                {/* <li > <Link to={'/about'}>About</Link></li> */}
+                {isAdmin && <li > <Link to={'/sessionsList'}>Sessions List</Link></li>}
             </ul>
             <ul class="right hide-on-med-and-down">
                 {isAdmin && <li><a className="waves-effect waves-light btn" onClick={handleCreateNewSession}>Create New Session</a></li>}
